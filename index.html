@@ -12160,22 +12160,47 @@
     };
     
     /*************************************************
-     * 2) Local Storage for progress
-     *************************************************/
-    const LS_KEY = "physeks_progress";
-    let completedSet = new Set(JSON.parse(localStorage.getItem(LS_KEY) || "[]"));
-    function saveProgress() {
-      localStorage.setItem(LS_KEY, JSON.stringify([...completedSet]));
-    }
+ * 2) Local Storage for progress
+ *************************************************/
+const LS_KEY = "physeks_progress";
+let completedSet = new Set();
+try {
+  const savedProgress = localStorage.getItem(LS_KEY);
+  completedSet = new Set(JSON.parse(savedProgress || "[]"));
+} catch (e) {
+  console.error("Error loading progress from localStorage:", e);
+  completedSet = new Set();
+}
 
-    /*************************************************
-     * 2b) Local Storage for assignments
-     *************************************************/
-    const LS_ASSIGNMENTS_KEY = "physeks_assignments";
-    let assignments = JSON.parse(localStorage.getItem(LS_ASSIGNMENTS_KEY) || "[]");
-    function saveAssignmentsToStorage() {
-      localStorage.setItem(LS_ASSIGNMENTS_KEY, JSON.stringify(assignments));
-    }
+function saveProgress() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify([...completedSet]));
+  } catch (e) {
+    console.error("Error saving progress to localStorage:", e);
+  }
+}
+
+/*************************************************
+ * 2b) Local Storage for assignments
+ *************************************************/
+const LS_ASSIGNMENTS_KEY = "physeks_assignments";
+let assignments = [];
+try {
+  const savedAssignments = localStorage.getItem(LS_ASSIGNMENTS_KEY);
+  assignments = JSON.parse(savedAssignments || "[]");
+} catch (e) {
+  console.error("Error loading assignments from localStorage:", e);
+  assignments = [];
+}
+
+function saveAssignmentsToStorage() {
+  try {
+    localStorage.setItem(LS_ASSIGNMENTS_KEY, JSON.stringify(assignments));
+  } catch (e) {
+    console.error("Error saving assignments to localStorage:", e);
+  }
+}
+
 
     /*************************************************
      * 3) Auto-format problem text
