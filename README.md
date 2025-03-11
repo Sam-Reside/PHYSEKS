@@ -35,5 +35,5 @@ PHYSEKS is an interactive physics learning platform inspired by ALEKS built usin
 - The **pie chart** updates dynamically based on completed topics.
 - Hover over a section to see detailed stats.
 
-- Disclaimer & AI Use
+### **Disclaimer & AI Use**
 Parts of this project (including code and documentation) were developed with the assistance of OpenAI’s ChatGPT. While I have tested and reviewed the output, please be aware that AI-generated content may contain errors.
