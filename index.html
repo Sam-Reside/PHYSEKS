@@ -101,7 +101,33 @@
       color: #fff;
       display: none;
     }
-  
+
+    
+    /* Textbook Button */
+    #textbookBtn {
+        background-color: #ffffff;
+        color: white;
+        border: none;
+        padding: 8px; /* Adjust padding */
+        width: 40px; /* Make it square */
+        height: 40px; /* Make it square */
+        font-size: 20px; /* Adjust emoji size */
+        border-radius: 4px; /* Match rounded corners */
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #textbookBtn:hover {
+        background-color: #f0f0f0; /* Slightly darker on hover */
+    }
+
+    #textbookDiv {
+        display: inline-block;
+        margin-left: 10px; /* Adjust spacing if necessary */
+    }
+    
     /* Main container: pinned between header (60px) and footer (120px) */
     #container {
       position: absolute;
@@ -411,6 +437,11 @@
         <div id="assignmentProgressFill"></div>
       </div>
       <div id="assignmentProgressText"></div>
+    </div>
+    <div id="textbookDiv">
+      <a href="https://openstax.org/books/university-physics-volume-1/pages/1-introduction" target="_blank">
+        <button id="textbookBtn">📚</button>
+      </a>
     </div>
   </header>
 
