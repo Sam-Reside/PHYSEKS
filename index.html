@@ -12,406 +12,457 @@
   <script src="https://widget.mixcloud.com/media/js/widgetApi.js"></script>
 
   <style>
-    /* Reset and global settings */
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      box-sizing: border-box;
-    }
-    *, *::before, *::after {
-      box-sizing: inherit;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-    }
-  
-    /* Fixed header at 60px */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-  
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #3f51b5;
-      color: #fff;
-      padding: 10px 15px;
-      font-size: 1.5em;
-      z-index: 999; /* ensure it stays on top */
-    }
-    .brand-title {
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-    }
-    #menuToggle {
-      cursor: pointer;
-      margin-right: 10px; 
-    }
-    #assignmentsMenu {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.95em;
-    }
-    /* Assignment controls */
-    #assignmentSelect {
-      font-size: 0.95em;
-      padding: 2px 4px;
-      border-radius: 4px;
-      border: none;
-    }
-    #addAssignmentBtn, #removeAssignmentBtn {
-      background: #fff;
-      color: #3f51b5;
-      border: none;
-      padding: 6px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85em;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-    #addAssignmentBtn:hover, #removeAssignmentBtn:hover {
-      background: #e6e6e6;
-    }
-    #assignmentProgressBar {
-      width: 200px;
-      background: #ccc;
-      border-radius: 4px;
-      height: 10px;
-      position: relative;
-      display: none;
-    }
-    #assignmentProgressFill {
-      background: #2196f3;
-      height: 10px;
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-    #assignmentProgressText {
-      margin-top: 2px;
-      font-size: 0.8em;
-      color: #fff;
-      display: none;
-    }
+/* ---------------------------------------
+   1) Reset and global settings
+---------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
 
-    
-    /* Textbook Button */
-    #textbookBtn {
-        background-color: #ffffff;
-        color: white;
-        border: none;
-        padding: 8px; /* Adjust padding */
-        width: 40px; /* Make it square */
-        height: 40px; /* Make it square */
-        font-size: 20px; /* Adjust emoji size */
-        border-radius: 4px; /* Match rounded corners */
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+/* ---------------------------------------
+   2) Fixed Header (60px)
+---------------------------------------- */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
 
-    #textbookBtn:hover {
-        background-color: #f0f0f0; /* Slightly darker on hover */
-    }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #3f51b5;
+  color: #fff;
+  padding: 10px 15px;
+  font-size: 1.5em;
+  z-index: 999; /* ensure it stays on top */
+}
+.brand-title {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+#menuToggle {
+  cursor: pointer;
+  margin-right: 10px; 
+}
+#assignmentsMenu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95em;
+}
 
-    #textbookDiv {
-        display: inline-block;
-        margin-left: 10px; /* Adjust spacing if necessary */
-    }
-    
-    /* Main container: pinned between header (60px) and footer (120px) */
-    #container {
-      position: absolute;
-      top: 60px;      /* below the fixed header */
-      bottom: 120px;  /* above the fixed footer */
-      left: 0;
-      right: 0;
-  
-      display: flex;
-      overflow: hidden; /* so the sidebar can scroll internally */
-    }
-  
-    /* Scrollable sidebar */
-    #sidebar {
-      width: 280px;
-      background: #fff;
-      border-right: 1px solid #ddd;
-      overflow: hidden; /* Prevent content from escaping */
-      display: flex;
-      flex-direction: column;
-      height: 100%; /* Full height of container */
-    }
-  
-    /* Sidebar content should scroll independently */
-    #sidebarContent {
-      flex-grow: 1;
-      overflow-y: auto;  /* Enables full scrolling inside */
-      padding-bottom: 10px; /* Avoids content hidden behind footer */
-    }
-  
-    /* Main content area */
-    #mainContent {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #fff;
-      position: relative;
-    }
-  
-    /* --- Sidebar Styling --- */
-    .unit-item {
-      margin-bottom: 15px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
-    }
-    .unit-header {
-      cursor: pointer;
-      padding: 10px 12px;
-      background: #fff;
-      border-radius: 3px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.3s;
-      margin-bottom: 5px;
-      /* Thick color border assigned in JS */
-      border-left: 8px solid #999; 
-      color: #333;
-    }
-    .unit-header:hover {
-      background: #f0f0f0;
-    }
-    .unit-item.open .unit-header {
-      background: #f0f0f0;
-    }
-  
-    /* Collapsible topic list */
-    .topic-list {
-      list-style: none;
-      padding-left: 15px;
-      margin: 5px 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-    .unit-item.open .topic-list {
-      max-height: 1000px;
-    }
-  
-    .topic-item {
-      margin-bottom: 10px;
-    }
-    .topic-header {
-      cursor: pointer;
-      padding: 8px 10px;
-      background: #f1f3f5;
-      border-radius: 3px;
-      margin: 4px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: background 0.3s;
-    }
-    .topic-header:hover {
-      background: #e9ecef;
-    }
-    .topic-item.open .topic-header {
-      background: #e9ecef;
-    }
-    .topic-item.selected .topic-header {
-      background: #ced4da;
-      font-weight: bold;
-    }
-  
-    /* Collapsible problem list + scroll for long lists */
-    .problem-list {
-      list-style: none;
-      padding-left: 20px;
-      margin: 4px 0;
-      max-height: 0;            /* Start collapsed */
-      overflow-y: hidden;       /* Hide until expanded */
-      transition: max-height 0.3s ease;
-    }
-    .topic-item.open .problem-list {
-      max-height: 60vh;        /* Expand up to 60% of viewport height */
-      overflow-y: auto;        /* Scrollbar if list is too long */
-    }
-  
-    .problem-item {
-      margin: 4px 0;
-      padding: 4px 6px;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    .problem-item:hover {
-      background: #e9ecef;
-    }
-    .problem-item.completed {
-      color: #28a745; 
-    }
-    .problem-item.active {
-      background: #d0e7ff; 
-    }
-    .reset-btn {
-      background: none;
-      border: none;
-      color: #6c757d;
-      cursor: pointer;
-      font-size: 0.9em;
-      margin-left: 5px;
-    }
-    #resetAllBtn {
-      background: #f44336;
-      color: #fff;
-      border: none;
-      padding: 8px;
-      width: 100%;
-      border-radius: 3px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-  
-    /* Home Page Placeholder Styles */
-    #placeholder {
-      max-width: 700px;
-      margin: 20px auto;
-      background: #fff;
-      border-radius: 5px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      padding: 20px;
-      line-height: 1.6;
-    }
-    #placeholder h2 {
-      margin-top: 0;
-      color: #3f51b5;
-      font-size: 1.6em;
-    }
-    #placeholder h3 {
-      margin-top: 1.2em;
-      color: #333;
-    }
-    #placeholder p {
-      margin: 0.8em 0;
-    }
-    #placeholder ul {
-      margin: 0.8em 0 1em 1.5em;
-      padding: 0;
-    }
-    #placeholder ul li {
-      margin-bottom: 0.5em;
-    }
-  
-    /* Pie Chart and Main Content */
-    #pieContainer {
-      position: relative;
-      width: 400px;
-      height: 400px;
-      margin: 0 auto;
-    }
-    #pieCanvas {
-      width: 100%;
-      height: 100%;
-      background: #fff;
-    }
-    #centerLabel {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2em;
-      font-weight: bold;
-      color: #333;
-      background: #fff;
-      padding: 12px;
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
-      pointer-events: none;
-    }
-    #pieTooltip {
-      position: absolute;
-      background: rgba(0,0,0,0.75);
-      color: #fff;
-      padding: 5px 8px;
-      border-radius: 4px;
-      font-size: 0.9em;
-      display: none;
-      pointer-events: none;
-    }
-    #problemDisplay {
-      margin-top: 20px;
-      border: 1px solid #ccc;
-      background: #fafafa;
-      padding: 15px;
-      border-radius: 5px;
-      display: none;
-    }
-    #problemTitle {
-      margin-top: 0;
-    }
-    #problemText {
-      line-height: 1.5;
-    }
-    #problemImages img {
-      max-width: 100%;
-      margin: 10px 0;
-    }
-    .problem-controls {
-      margin-top: 10px;
-      text-align: center;
-    }
-    .problem-controls button {
-      padding: 6px 10px;
-      margin: 5px;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      background: #007bff;
-      color: #fff;
-      min-width: 80px;
-    }
-    .problem-controls button:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-    .completed-btn {
-      background: #28a745 !important;
-    }
-  
-    /* Badge icon styling (badges are emojis) */
-    .topic-item.completed-topic .topic-header {
-      color: #2e7d32;
-    }
-    .unit-item.completed-unit .unit-header {
-      color: #2e7d32;
-    }
-  
-    /* Fixed footer at 120px (collapsible) */
-    #audioFooter {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 120px;
-  
-      background: #f2f2f2;
-      color: #333;
-      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
-      z-index: 1000;
-      transition: height 0.3s ease;
-    }
-    /* Hide audio controls when collapsed */
-    #audioFooter.collapsed #audioControls {
-      display: none;
-    }
+/* Assignment controls */
+#assignmentSelect {
+  font-size: 0.95em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  border: none;
+}
+#addAssignmentBtn, #removeAssignmentBtn {
+  background: #fff;
+  color: #3f51b5;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+#addAssignmentBtn:hover, #removeAssignmentBtn:hover {
+  background: #e6e6e6;
+}
+#assignmentProgressBar {
+  width: 200px;
+  background: #ccc;
+  border-radius: 4px;
+  height: 10px;
+  position: relative;
+  display: none;
+}
+#assignmentProgressFill {
+  background: #2196f3;
+  height: 10px;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+#assignmentProgressText {
+  margin-top: 2px;
+  font-size: 0.8em;
+  color: #fff;
+  display: none;
+}
+
+/* ---------------------------------------
+   3) Textbook Button
+---------------------------------------- */
+#textbookBtn {
+  background-color: #ffffff;
+  color: white;
+  border: none;
+  padding: 8px;       /* Adjust padding */
+  width: 40px;        /* Make it square */
+  height: 40px;       /* Make it square */
+  font-size: 20px;    /* Adjust emoji size */
+  border-radius: 4px; /* Match rounded corners */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#textbookBtn:hover {
+  background-color: #f0f0f0; /* Slightly darker on hover */
+}
+#textbookDiv {
+  display: inline-block;
+  margin-left: 10px; /* Adjust spacing if necessary */
+}
+
+/* ---------------------------------------
+   4) Main Container (pinned between header & footer)
+---------------------------------------- */
+#container {
+  position: fixed;
+  top: 60px; 
+  bottom: 120px;
+  left: 0;
+  right: 0;
+  display: flex;
+  overflow: hidden;
+  background: #fff; /* Ensures background matches */
+  padding: 0; /* Remove any padding */
+  margin: 0;
+}
+
+
+/* When sidebar is collapsed, let container adjust */
+#sidebar.collapsed ~ #container {
+  margin-left: 0;
+}
+
+
+/* ---------------------------------------
+   5) Collapsible Sidebar
+---------------------------------------- */
+/* Sidebar Default (Expanded) */
+#sidebar {
+  width: 280px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* When Sidebar is Collapsed */
+#sidebar.collapsed {
+  width: 0;
+  overflow: hidden;
+}
+
+/* Main content area - Dynamic Width */
+#mainContent {
+  padding: 20px;
+  overflow-y: auto;
+  background: #fff;
+  position: relative;
+  transition: width 0.3s ease, margin-left 0.3s ease;
+  width: calc(100% - 280px); /* Default when sidebar is visible */
+  margin-left: 280px;
+}
+
+/* When Sidebar is Collapsed, Expand Main Content */
+#sidebar.collapsed + #mainContent {
+  width: 100%;
+  margin-left: 0;
+}
+
+
+
+
+
+/* ---------------------------------------
+   6) Sidebar Styling (units/topics/problems)
+---------------------------------------- */
+.unit-item {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+}
+.unit-header {
+  cursor: pointer;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+  margin-bottom: 5px;
+  /* Thick color border assigned in JS */
+  border-left: 8px solid #999; 
+  color: #333;
+}
+.unit-header:hover {
+  background: #f0f0f0;
+}
+.unit-item.open .unit-header {
+  background: #f0f0f0;
+}
+
+/* Collapsible topic list */
+.topic-list {
+  list-style: none;
+  padding-left: 15px;
+  margin: 5px 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.unit-item.open .topic-list {
+  max-height: 1000px;
+}
+
+.topic-item {
+  margin-bottom: 10px;
+}
+.topic-header {
+  cursor: pointer;
+  padding: 8px 10px;
+  background: #f1f3f5;
+  border-radius: 3px;
+  margin: 4px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+}
+.topic-header:hover {
+  background: #e9ecef;
+}
+.topic-item.open .topic-header {
+  background: #e9ecef;
+}
+.topic-item.selected .topic-header {
+  background: #ced4da;
+  font-weight: bold;
+}
+
+/* Collapsible problem list + scroll for long lists */
+.problem-list {
+  list-style: none;
+  padding-left: 20px;
+  margin: 4px 0;
+  max-height: 0;            /* Start collapsed */
+  overflow-y: hidden;       /* Hide until expanded */
+  transition: max-height 0.3s ease;
+}
+.topic-item.open .problem-list {
+  max-height: 60vh;         /* Expand up to 60% of viewport height */
+  overflow-y: auto;         /* Scrollbar if list is too long */
+}
+
+.problem-item {
+  margin: 4px 0;
+  padding: 4px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.problem-item:hover {
+  background: #e9ecef;
+}
+.problem-item.completed {
+  color: #28a745; 
+}
+.problem-item.active {
+  background: #d0e7ff; 
+}
+.reset-btn {
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+#resetAllBtn {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px;
+  width: 100%;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* ---------------------------------------
+   7) Home Page Placeholder
+---------------------------------------- */
+#placeholder {
+  max-width: 700px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 20px;
+  line-height: 1.6;
+}
+#placeholder h2 {
+  margin-top: 0;
+  color: #3f51b5;
+  font-size: 1.6em;
+}
+#placeholder h3 {
+  margin-top: 1.2em;
+  color: #333;
+}
+#placeholder p {
+  margin: 0.8em 0;
+}
+#placeholder ul {
+  margin: 0.8em 0 1em 1.5em;
+  padding: 0;
+}
+#placeholder ul li {
+  margin-bottom: 0.5em;
+}
+
+/* ---------------------------------------
+   8) Pie Chart + Main Content
+---------------------------------------- */
+#pieContainer {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+#pieCanvas {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+}
+#centerLabel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+  background: #fff;
+  padding: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+#pieTooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  display: none;
+  pointer-events: none;
+}
+#problemDisplay {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 5px;
+  display: none;
+}
+#problemTitle {
+  margin-top: 0;
+}
+#problemText {
+  line-height: 1.5;
+}
+#problemImages img {
+  max-width: 100%;
+  margin: 10px 0;
+}
+.problem-controls {
+  margin-top: 10px;
+  text-align: center;
+}
+.problem-controls button {
+  padding: 6px 10px;
+  margin: 5px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+  min-width: 80px;
+}
+.problem-controls button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.completed-btn {
+  background: #28a745 !important;
+}
+
+/* Badge icon styling (badges are emojis) */
+.topic-item.completed-topic .topic-header {
+  color: #2e7d32;
+}
+.unit-item.completed-unit .unit-header {
+  color: #2e7d32;
+}
+
+/* ---------------------------------------
+   9) Footer (Collapsible)
+---------------------------------------- */
+#audioFooter {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;       /* Original (expanded) footer height */
+  background: #f2f2f2;
+  color: #333;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+  transition: height 0.3s ease;
+}
+#audioFooter.collapsed {
+  height: 30px;
+  overflow: hidden;
+}
+.footer-toggle-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px; /* same as collapsed height */
+  background: #ddd;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+}
+#audioFooter.collapsed #audioControls {
+  display: none;
+}
+
   </style>
   
   
@@ -13330,6 +13381,16 @@
       });
       return foundIds;
     }
+    document.getElementById("menuToggle").addEventListener("click", function() {
+    var sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("collapsed");
+});
+
+
+
+
+
+
   </script>
 
   <!-- Collapsible Footer Section -->
@@ -13341,8 +13402,8 @@
     </div>
 
     <!-- Actual audio controls (hidden if .collapsed is applied) -->
-    <div id="audioControls">
-      <!-- Container for the audio player, ~25% width -->
+    <div id="audioControls" style="display: flex; align-items: center; padding: 5px;">
+      <!-- Audio iframe container -->
       <div id="audioContainer" style="width: 25%; margin-right: 10px;">
         <iframe 
           id="audioPlayer"
@@ -13353,86 +13414,88 @@
           style="border: none;"
         ></iframe>
       </div>
-
-      <!-- Controls container (dropdown and volume slider) -->
-      <div style="display: flex; flex-direction: column;">
+    
+      <!-- Controls container (dropdown and volume slider side by side) -->
+      <div style="display: flex; flex-direction: row; align-items: center;">
         <!-- Dropdown menu for selecting audio tracks -->
-        <select id="audioSelect">
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-minecraft-music-up-to-minecraft-121%2F">
-            Minecraft Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fan-extra-long-night-in-xenoblade-relaxing-xc-music-up-to-future-redeemed%2F">
-            Xenoblade Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-long-night-in-hyrule-relaxing-zelda-music-up-to-echoes-of-wisdom%2F">
-            Zelda Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-calm-day-in-pok%C3%A9mon-relaxing-pok%C3%A9mon-music-up-to-sv-the-indigo-disk%2F">
-            Pokémon Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-persona-music-up-to-persona-5-tactica%2F">
-            Persona Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-long-day-in-fire-emblem-relaxing-fe-music-up-to-engage%2F">
-            Fire Emblem Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-ori-music%2F">
-            Ori Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fchill-kirby-music-to-vibe-to%2F">
-            Kirby Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-soulsborne-music-up-to-er-shadow-of-the-erdtree%2F">
-            Soulsborne Music
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Flucid-dreams-relaxing-video-game-music%2F">
-            Lucid Dreams
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-deep-dive-relaxing-video-game-music%2F">
-            A Deep Dive
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fcolorful-spring-relaxing-video-game-music%2F">
-            Colorful Spring
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fpeaceful-peaks-relaxing-video-game-music%2F">
-            Peaceful Peaks
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fjungle-jams-relaxing-video-game-music%2F">
-            Jungle Jam
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fspace-ambience-relaxing-video-game-music%2F">
-            Space Ambience
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fcomfy-caf%C3%A9-relaxing-video-game-music%2F">
-            Cozy Cafe
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Flonely-winter-relaxing-video-game-music%2F">
-            Lonely Winter
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fhealing-thunderstorm%2F">
-            Thunderstorm
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fthe-sound-of-a-rushing-river%2F">
-            River
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fcalming-night-rain%2F">
-            Rainy Night
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fwindy-forest-ambience%2F">
-            Windy Forest
-          </option>
-          <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fthe-sound-of-burning-wood%2F">
-            Burning Wood
-          </option>
-          <!-- Add more options as needed -->
-        </select>
-        
+        <select id="audioSelect" style="margin-right: 10px;">
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-minecraft-music-up-to-minecraft-121%2F">
+              Minecraft Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fan-extra-long-night-in-xenoblade-relaxing-xc-music-up-to-future-redeemed%2F">
+              Xenoblade Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-long-night-in-hyrule-relaxing-zelda-music-up-to-echoes-of-wisdom%2F">
+              Zelda Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-calm-day-in-pok%C3%A9mon-relaxing-pok%C3%A9mon-music-up-to-sv-the-indigo-disk%2F">
+              Pokémon Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-persona-music-up-to-persona-5-tactica%2F">
+              Persona Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-long-day-in-fire-emblem-relaxing-fe-music-up-to-engage%2F">
+              Fire Emblem Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-ori-music%2F">
+              Ori Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fchill-kirby-music-to-vibe-to%2F">
+              Kirby Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Frelaxing-soulsborne-music-up-to-er-shadow-of-the-erdtree%2F">
+              Soulsborne Music
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Flucid-dreams-relaxing-video-game-music%2F">
+              Lucid Dreams
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fa-deep-dive-relaxing-video-game-music%2F">
+              A Deep Dive
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fcolorful-spring-relaxing-video-game-music%2F">
+              Colorful Spring
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fpeaceful-peaks-relaxing-video-game-music%2F">
+              Peaceful Peaks
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fjungle-jams-relaxing-video-game-music%2F">
+              Jungle Jam
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fspace-ambience-relaxing-video-game-music%2F">
+              Space Ambience
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Fcomfy-caf%C3%A9-relaxing-video-game-music%2F">
+              Cozy Cafe
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FOmniST%2Flonely-winter-relaxing-video-game-music%2F">
+              Lonely Winter
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fhealing-thunderstorm%2F">
+              Thunderstorm
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fthe-sound-of-a-rushing-river%2F">
+              River
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fcalming-night-rain%2F">
+              Rainy Night
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fwindy-forest-ambience%2F">
+              Windy Forest
+            </option>
+            <option value="https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=%2FSnore_Magazine%2Fthe-sound-of-burning-wood%2F">
+              Burning Wood
+            </option>
+            <!-- Add more options as needed -->
+          </select>
+    
         <!-- Volume Slider -->
-        <div>
-          <label for="volumeSlider">Volume:</label>
+        <div style="display: flex; align-items: center;">
+          <label for="volumeSlider" style="margin-right: 5px;">Volume:</label>
           <input type="range" id="volumeSlider" min="0" max="100" value="100">
         </div>
       </div>
+    </div>
+      
     </div>
   </footer>
 
@@ -13441,11 +13504,21 @@
   <script>
     // Toggle the footer's "collapsed" class
     document.getElementById("footerToggle").addEventListener("click", function() {
-      var footer = document.getElementById("audioFooter");
-      footer.classList.toggle("collapsed");
-      // Flip arrow
-      this.textContent = footer.classList.contains("collapsed") ? "▲" : "▼";
-    });
+  var footer = document.getElementById("audioFooter");
+  var container = document.getElementById("container");
+
+  footer.classList.toggle("collapsed");
+
+  if (footer.classList.contains("collapsed")) {
+    this.textContent = "▲";
+    container.style.bottom = "30px"; // Adjust container bottom height to match collapsed footer
+  } else {
+    this.textContent = "▼";
+    container.style.bottom = "120px"; // Restore original container height when expanded
+  }
+});
+
+
 
     // Initialize Mixcloud widget after DOM load
     var mixcloudWidget;
