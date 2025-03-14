@@ -149,6 +149,7 @@ header {
 }
 
 
+
 /* When sidebar is collapsed, let container adjust */
 #sidebar.collapsed ~ #container {
   margin-left: 0;
@@ -173,25 +174,30 @@ header {
 /* When Sidebar is Collapsed */
 #sidebar.collapsed {
   width: 0;
+  padding: 0;
+  border: none;
   overflow: hidden;
 }
 
-/* Main content area - Dynamic Width */
+
+/* Default (Sidebar Expanded) */
 #mainContent {
+  flex: 1;
   padding: 20px;
   overflow-y: auto;
   background: #fff;
   position: relative;
-  transition: width 0.3s ease, margin-left 0.3s ease;
-  width: calc(100% - 280px); /* Default when sidebar is visible */
-  margin-left: 280px;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: calc(100% - 280px); /* Adjust width dynamically */
+  margin-left: 280px; /* Match sidebar width */
 }
 
-/* When Sidebar is Collapsed, Expand Main Content */
+/* When Sidebar is Collapsed */
 #sidebar.collapsed + #mainContent {
   width: 100%;
   margin-left: 0;
 }
+
 
 
 
